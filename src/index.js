@@ -1,10 +1,19 @@
 const path = require("path");
+
 const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const Filter = require("bad-words");
-const {generateMessage,generateLocationMessage} = require("./utils/messages");
-const {addUser,removeUser,getUser,getUsersInRoom} = require("./utils/users");
+const {
+  generateMessage,
+  generateLocationMessage
+} = require("./utils/messages");
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom
+} = require("./utils/users");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,7 +25,6 @@ const publicDirectoryPath = path.join(__dirname, "../public");
 app.use(express.static(publicDirectoryPath));
 
 io.on("connection", socket => {
-
   socket.on("join", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
 
@@ -27,7 +35,9 @@ io.on("connection", socket => {
     socket.join(user.room);
 
     socket.emit("message", generateMessage("Admin", "Welcome"));
-    socket.broadcast.to(user.room).emit("message", generateMessage("Admin", `${user.username} has joined`));
+    socket.broadcast
+      .to(user.room)
+      .emit("message", generateMessage("Admin", `${user.username} has joined`));
 
     io.to(user.room).emit("roomData", {
       room: user.room,
